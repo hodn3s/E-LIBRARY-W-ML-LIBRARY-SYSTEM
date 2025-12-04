@@ -17,14 +17,12 @@ def add_bg_from_local(image_file):
     <style>
     [data-testid="stAppViewContainer"] {{
     background-image: url("data:image/png;base64,{encoded}");
-    background-size: contain;
-    background-position: center center;
-    background-repeat: no-repeat;
+    background-size: cover;       /* fit the entire image inside container */
+    background-position: top; /* align image to top center */
+    background-repeat: no-repeat;   /* don't repeat */
     width: 100%;
-    height: 100vh;   /* ensures full image displays */
-    background-color: #000; /* optional: fills empty space */
-
-        
+    min-height: 100vh;              /* ensures container is at least viewport height */
+    /* background-color: transparent; optional */
     }}
     
      label[aria-hidden="true"] div[data-testid="stMarkdownContainer"] > p {{
@@ -64,41 +62,49 @@ def add_bg_from_local(image_file):
         height: 50px;             /* fixed height */
     }}
     .books-container {{
-        display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 20px;
-                margin-top: 20px;
-            }}
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    gap: 20px;
+    margin-top: 20px;
+    overflow-x: auto;
+    padding-bottom: 10px;
+    color: black !important; /* optional, can stay */
+}}
 
-            /* Individual book cards */
-    .book-card {{
-        background: rgba(0, 0, 0, 0.6);  /* semi-transparent dark */
-        border-radius: 15px;
-        padding: 10px;
-        text-align: center;
-        color: white;
-        width: 180px;        /* card width */
-        flex: 1 1 180px;     /* responsive flex */
-        box-shadow: 0px 4px 6px rgba(0,0,0,0.5);
-        transition: transform 0.2s, box-shadow 0.2s;
-            }}
+/* Individual book cards */
+.book-card {{
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 15px;
+    padding: 10px;
+    text-align: center;
+    color: black !important; /* change from white to black */
+    width: 250px;
+    flex: 0 0 250px;
+    box-shadow: 0px 4px 6px rgba(0,0,0,0.5);
+    transition: transform 0.2s, box-shadow 0.2s;
+}}
 
-    .book-card:hover {{
-        transform: translateY(-5px);
-        box-shadow: 0px 8px 12px rgba(0,0,0,0.6);
-            }}
+.book-card:hover {{
+    transform: translateY(-5px);
+    box-shadow: 0px 8px 12px rgba(0,0,0,0.6);
+}}
 
-    .book-card img {{
-        max-width: 100%;
-        height: auto;
-        border-radius: 10px;
-            }}
+.book-card img {{
+    width: 100%;
+    height: 350px;
+    object-fit: cover;
+    border-radius: 10px;
+}}
 
-    .book-card h4 {{
-        margin: 8px 0 0 0;
-        font-size: 16px;
-            }}
+.book-card h4 {{
+    margin: 20px 0 0 0;
+    font-size: 18px;
+    font-color: black;
+   
+}}
+
+
     </style>
     """
     st.markdown(css, unsafe_allow_html=True)
@@ -106,7 +112,7 @@ def add_bg_from_local(image_file):
     st.markdown("""
     <div style="
         position: fixed;
-        bottom: 700px;
+        bottom: 200px;
         left: 50%;
         transform: translateX(-50%);
         text-align: center;
@@ -114,7 +120,7 @@ def add_bg_from_local(image_file):
     ">
     <a href="https://ser-infotech.com/user" target="_blank"
         style="
-            background: transparent;
+            background: red;
             padding: 12px 28px;
             color: white;
             text-decoration: none;
@@ -124,7 +130,7 @@ def add_bg_from_local(image_file):
             cursor: pointer;
             display: inline-block;
         ">
-        Visit CDM E-LIBRARY
+        Log-In to CDM E-LIBRARY
     </a>
 
 
@@ -206,7 +212,7 @@ class Recommendation:
             recommended_books, poster_url = self.recommend_book(selected_books)
             container = st.container()  # create a container
             with container:
-                col1, col2, col3, col4, col5 = st.columns(5)
+                col1, col2, col3, col4, col5, col6, col7, col8, col9, col10 = st.columns(10)
             with col1:
                 st.text(recommended_books[1])
                 st.image(poster_url[1])
@@ -220,6 +226,21 @@ class Recommendation:
                 st.text(recommended_books[4])
                 st.image(poster_url[4])
             with col5:
+                st.text(recommended_books[5])
+                st.image(poster_url[5])
+            with col6:
+                st.text(recommended_books[1])
+                st.image(poster_url[1])
+            with col7:
+                st.text(recommended_books[2])
+                st.image(poster_url[2])
+            with col8:
+                st.text(recommended_books[3])
+                st.image(poster_url[3])
+            with col9:
+                st.text(recommended_books[4])
+                st.image(poster_url[4])
+            with col10:
                 st.text(recommended_books[5])
                 st.image(poster_url[5])
         except Exception as e:
@@ -239,31 +260,26 @@ if __name__ == "__main__":
     st.write("")
     st.write("")
     st.write("")
-    st.write("")
-    st.write("")
-    st.write("")
-    st.write("")
 
-    left, center, right = st.columns([1, 2, 1])  # center column
+   # Keep the selectbox and buttons in the center column
+left, center, right = st.columns([1,2,1])
 
-    with center:
-        obj = Recommendation()
-        book_names = pickle.load(open(os.path.join('templates', 'book_names.pkl'), 'rb'))
-        selected_books = st.selectbox(
-            "What kind of books that interest you? select from dropdown below",
-            book_names
-        )
+with center:
+    obj = Recommendation()
+    book_names = pickle.load(open(os.path.join('templates', 'book_names.pkl'), 'rb'))
+    selected_books = st.selectbox(
+        "What kind of books that interest you? select from dropdown below",
+        book_names
+    )
 
-        # Create 2 buttons side by side
-        # --- SIDE-BY-SIDE BUTTONS ---
-        col1, col2 = st.columns([1, 1])
-        with col1:
-            if st.button('Train'):
-                obj.train_engine()
+    col1, col2 = st.columns([1,1])
+    with col1:
+        if st.button('Train'):
+            obj.train_engine()
+    with col2:
+        if st.button('Recommend'):
+            pass  # trigger recommendation
 
-        with col2:
-            if st.button('Recommend'):
-        # call outside the columns block
-                st.write("")  # optional spacing
-                st.write("")  # end of columns
-        obj.recommendations_engine(selected_books)  # safe, no column nesting
+# --- Move recommendations outside the center column ---
+obj.recommendations_engine(selected_books)  # now can take full page width
+
